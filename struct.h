@@ -54,9 +54,7 @@ typedef struct
 	char       s_UpdateState;       //是否需要更新状态
 	char       s_TargetNumForUpdate;
 	float      s_featureError;
-	char        s_Pihao;           //当前目标的批号//2013.8.14
-
-
+	char       s_Pihao;            //当前目标的批号//2013.8.14
 }CHAIN;
 
 #endif

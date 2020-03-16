@@ -413,7 +413,7 @@ void AutoAriSmallTarTrack()
 			}
 			else
 			{
-		    	MobanMatch( );
+		    	MobanMatch();
 			}
 	   }
 	   g_trackFrameCounter++;

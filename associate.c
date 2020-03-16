@@ -4,24 +4,24 @@
 *************************************************************************/
 #include "associate.h"
 #include "match.h"
-#include   "struct.h"
+#include "struct.h"
 #include "track.h"
 //==========================================================================================
-volatile int g_iTargetNumInChain = 0;
-volatile int g_iTargetNumInCurChain = 0;
+volatile int 			g_iTargetNumInChain = 0;
+volatile int 			g_iTargetNumInCurChain = 0;
 volatile int            g_iTrackObjCount=0;  
-volatile int g_iFrameCount = 0;	
+volatile int 			g_iFrameCount = 0;	
 unsigned char           MaxPiHao=0;
 unsigned char           NewObjPH[10]={0};
 unsigned char           NewObjPHNum = 0;
 unsigned char           NewObjPiHao=0,target_capture=0;
 
 //==========================================================================================
-#define		MAX_FEAT_NUM			200		    //关联目标链最大目标数(暂定20,最大目标数目只有16--cui）//200
-CHAIN           *g_TargetFeatureChain   = (CHAIN *)(CHAIN_ADDR+0x00001320);	//目标链
-CHAIN           *g_CurTargetFeatureChain= (CHAIN *)(CHAIN_ADDR+0x000022F6);/////////当前帧中关联上的目标及新检测到的目标///2013.8.14
+#define		MAX_FEAT_NUM			 200		    						//关联目标链最大目标数(暂定20,最大目标数目只有16--cui）//200
+CHAIN       *g_TargetFeatureChain    = (CHAIN *)(CHAIN_ADDR+0x00001320);	//目标链
+CHAIN       *g_CurTargetFeatureChain = (CHAIN *)(CHAIN_ADDR+0x000022F6);	//当前帧中关联上的目标及新检测到的目标///2013.8.14
 //==========================================================================================
-float abs_f(float a,float b)
+float abs_f(float a, float b)
 {
 	float r;
 
@@ -56,18 +56,19 @@ void SetTargetFeatureZero(TARFEATURE tarfeature)
 */
 void SetTargetInChainZero(int pos)
 {
-	g_TargetFeatureChain[pos].s_iChainSum	= 0;
-	g_TargetFeatureChain[pos].s_all_x		= 0;
-	g_TargetFeatureChain[pos].s_all_y		= 0;
-	g_TargetFeatureChain[pos].s_Last_C_Col  = 0;
-	g_TargetFeatureChain[pos].s_Last_C_Row  = 0;
-	g_TargetFeatureChain[pos].s_missFrameSum = 0;
-	g_TargetFeatureChain[pos].s_featureError = 1000.0f;
-	g_TargetFeatureChain[pos].s_UpdateState = 0;
-	g_TargetFeatureChain[pos].s_TargetNumForUpdate = 0;
+	g_TargetFeatureChain[pos].s_iChainSum	        = 0;
+	g_TargetFeatureChain[pos].s_all_x		        = 0;
+	g_TargetFeatureChain[pos].s_all_y		        = 0;
+	g_TargetFeatureChain[pos].s_Last_C_Col          = 0;
+	g_TargetFeatureChain[pos].s_Last_C_Row          = 0;
+	g_TargetFeatureChain[pos].s_missFrameSum        = 0;
+	g_TargetFeatureChain[pos].s_featureError        = 1000.0f;
+	g_TargetFeatureChain[pos].s_UpdateState         = 0;
+	g_TargetFeatureChain[pos].s_TargetNumForUpdate  = 0;
 
 	SetTargetFeatureZero(g_TargetFeatureChain[pos].s_Feature);
 }
+
 //==========================================================================================
 /*函数作用：把当前帧图像目标链中pos位置处的目标的值设置为初始化值
   输入：pos：目标链中要删除的目标的位置
@@ -75,18 +76,19 @@ void SetTargetInChainZero(int pos)
 */
 void SetTargetInCurChainZero(int pos)
 {
-	g_CurTargetFeatureChain[pos].s_iChainSum	= 0;
-	g_CurTargetFeatureChain[pos].s_all_x=0;
-	g_CurTargetFeatureChain[pos].s_all_y		= 0;
-	g_CurTargetFeatureChain[pos].s_Last_C_Col  = 0;
-	g_CurTargetFeatureChain[pos].s_Last_C_Row  = 0;
-	g_CurTargetFeatureChain[pos].s_missFrameSum = 0;
-	g_CurTargetFeatureChain[pos].s_featureError = 1000.0f;
-	g_CurTargetFeatureChain[pos].s_UpdateState = 0;
+	g_CurTargetFeatureChain[pos].s_iChainSum	   = 0;
+	g_CurTargetFeatureChain[pos].s_all_x           = 0;
+	g_CurTargetFeatureChain[pos].s_all_y		   = 0;
+	g_CurTargetFeatureChain[pos].s_Last_C_Col      = 0;
+	g_CurTargetFeatureChain[pos].s_Last_C_Row      = 0;
+	g_CurTargetFeatureChain[pos].s_missFrameSum    = 0;
+	g_CurTargetFeatureChain[pos].s_featureError    = 1000.0f;
+	g_CurTargetFeatureChain[pos].s_UpdateState     = 0;
 	g_CurTargetFeatureChain[pos].s_TargetNumForUpdate = 0;
-    g_CurTargetFeatureChain[pos].s_Pihao=0;
+    g_CurTargetFeatureChain[pos].s_Pihao           = 0;
 	SetTargetFeatureZero(g_CurTargetFeatureChain[pos].s_Feature);
 }
+
 //==========================================================================================
 /*函数作用：初始化目标链
   输入：无
@@ -118,6 +120,7 @@ void InitTargetInCurChain()
 	}
 	g_iTargetNumInCurChain = 0;
 }
+
 //==========================================================================================
 /*函数作用：把目标tarFeature加入到目标链g_TargetFeatureChain的pos位置处
   输入：tarFeature：要加入到目标链中的目标
@@ -147,6 +150,7 @@ void AddTargetInChain_PH(TARFEATURE tarFeature, int pos, unsigned char PiHao)
 	
 	}	
 }
+
 //==========================================================================================
 /*函数作用：把第一帧中检测到的目标tarFeature加入到目标链g_TargetFeatureChain的pos位置处
   输入：tarFeature：要加入到目标链中的目标
@@ -199,7 +203,7 @@ void AddTargetInCurChain(TARFEATURE tarFeature, int pos)
 		g_CurTargetFeatureChain[pos].s_UpdateState = 0;
 		g_CurTargetFeatureChain[pos].s_TargetNumForUpdate = 0;
 
-        g_CurTargetFeatureChain[pos].s_Pihao=NewObjPiHao;////2013.8.14
+        g_CurTargetFeatureChain[pos].s_Pihao = NewObjPiHao;////2013.8.14
 		g_iTargetNumInCurChain++;
 	}	
 }
@@ -216,7 +220,7 @@ void AddTargetInCurChain2(TARFEATURE tarFeature, int pos,CHAIN tarChain)
 	if (pos + 1 <= MAX_FEAT_NUM)
 	{
 		g_CurTargetFeatureChain[pos].s_Feature = tarFeature;		
-        g_CurTargetFeatureChain[pos].s_Pihao=tarChain.s_Pihao;
+        g_CurTargetFeatureChain[pos].s_Pihao   = tarChain.s_Pihao;
 		g_iTargetNumInCurChain++;
 	}	
 }
@@ -240,6 +244,7 @@ void UpdateTargetInChain(TARFEATURE tarFeature, int pos)
 	g_TargetFeatureChain[pos].s_TargetNumForUpdate = 0;
 
 }
+
 //==========================================================================================
 /*函数作用：给没有批号的目标加入批号
   输入：NewPH：要加入的批号
@@ -266,6 +271,7 @@ void AddNewPH(unsigned char NewPH)
 
 	
 }
+
 //==========================================================================================
 /*函数作用：删除目标链中pos位置处的目标，并使其后面的目标依次前移一个位置
   输入：pos：目标链中要删除的目标的位置
@@ -293,6 +299,7 @@ void DeleteTargetInChain(int pos)
 
 	}
 }
+
 //==========================================================================================
 /*函数作用：计算目标距离视场中心的距离
   输入：srcFeat：要比较的目标
@@ -305,6 +312,7 @@ float  DiffDis(TARFEATURE srcFeat)
 
 	return fDifference;
 }
+
 //==========================================================================================
 /*函数作用：计算两个目标之间的位置偏差，也可以理解成计算两个目标之间的距离
   输入：srcFeat，destFeat：要比较的两个目标
@@ -330,6 +338,7 @@ float  DiffFeatAngle(TARFEATURE srcFeat, TARFEATURE destFeat)
 
 	return fDifference;
 }
+
 //==========================================================================================
 /*函数作用：计算两个目标之间的面积偏差
   入：srcFeat，destFeat：要比较的两个目标
@@ -342,6 +351,7 @@ float  DiffFeatArea(TARFEATURE srcFeat, TARFEATURE destFeat)
 
 	return fDifference;
 }
+
 //==========================================================================================
 /*函数作用：把目标链中的每个目标与当前帧中检测到的每个目标进行比较，找到与目标链中每个目标属于同一帧图像且距离最小的目标，
             若这两个目标之间的距离小于某个阈值，则认为这两个目标是同一个目标，更新目标链中的那个目标特征为当前帧中检测到的特征。
@@ -543,9 +553,5 @@ void Associate(TARFEATURE tarFeature[], int PossTarNum)
 			g_TargetFeatureChain[i].s_iChainSum = 0;					
 	}
 }
-
-
-
-
 
 
